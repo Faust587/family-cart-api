@@ -1,6 +1,6 @@
 export class Cart {
   constructor(
-    public id: string | null,
+    public id: number | null,
     public name: string,
   ) {}
 }
