@@ -9,11 +9,11 @@ export class AddUserToCartUseCase implements IAddUserToCartUseCase {
               private cartRepository: ICartRepository,
               private roleAssignmentRepository: IRoleAssignmentRepository) {}
 
-  async execute(userId: number, cartId: number): Promise<RoleAssignment> {
+  async execute(email: string, cartId: number): Promise<RoleAssignment> {
     const cart = await this.cartRepository.getById(cartId);
-    const user = await this.userRepository.getById(userId);
+    const user = await this.userRepository.getByEmail(email);
 
-    const isAssignmentExists = await this.roleAssignmentRepository.getByUserAndCartId(userId, cartId);
+    const isAssignmentExists = await this.roleAssignmentRepository.getByUserAndCartId(user.id , cartId);
     if (!!isAssignmentExists) {
       return isAssignmentExists;
     }

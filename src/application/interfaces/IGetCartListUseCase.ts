@@ -1,6 +1,6 @@
 import {Cart, CartItem} from '../../domain/entities/index';
 
-export class CartWithOwner extends Cart {
+export class CartWithOwnerAndMembers extends Cart {
   constructor(
     public id: number | null,
     public name: string,
@@ -10,6 +10,12 @@ export class CartWithOwner extends Cart {
       cart: Cart,
       name: string,
       isDone: boolean
+    }[],
+    public members: {
+      id: number | null,
+      email: string,
+      name: string,
+      owner: 'MEMBER' | 'OWNER',
     }[]
   ) {
     super(id, name);
@@ -17,5 +23,5 @@ export class CartWithOwner extends Cart {
 }
 
 export interface IGetCartListUseCase {
-  execute(userId: number): Promise<CartWithOwner[]>;
+  execute(userId: number): Promise<CartWithOwnerAndMembers[]>;
 }

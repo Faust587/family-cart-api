@@ -28,9 +28,35 @@ export class GetCartListUseCase implements IGetCartListUseCase{
     }[] = (await Promise.all(onlyMemberAssignments.map(cartId => this.cartRepository.getById(cartId))))
       .map(item => ({...item, isOwner: false}));
 
-    const allCarts = [...userGuessCarts, ...userOwnCarts]
+    const allCarts = [...userGuessCarts, ...userOwnCarts];
+    const members = await Promise.all(allCarts.map(cart => this.roleAssignmentRepository.getByCartId(cart.id)));
 
-    const cartItems = (await Promise.all(allCarts.map((item) => {
+    const flatData = members.flat();
+
+    const groupedByCartId = flatData.reduce((accumulator, currentItem) => {
+      const cartId = currentItem.cart.id;
+
+      if (!accumulator[cartId]) {
+        accumulator[cartId] = [];
+      }
+
+      accumulator[cartId].push(currentItem);
+      return accumulator;
+    }, {});
+
+    const cartsWithMembers = allCarts.map(cart => {
+      if (!groupedByCartId[cart.id]) return {
+        ...cart,
+        members: []
+      }
+      return {
+        ...cart,
+        members: groupedByCartId[cart.id].map((member) =>
+          ({id: member.user.id, name: member.user.name, email: member.user.email, role: member.role}))
+      }
+    })
+
+    const cartItems = (await Promise.all(cartsWithMembers.map((item) => {
       return this.cartItemRepository.getByCartId(item.id);
     })))
       .map(item =>
@@ -40,7 +66,7 @@ export class GetCartListUseCase implements IGetCartListUseCase{
 
     const formattedCartItems = Object.fromEntries(cartItems);
 
-    return allCarts.map((cart) => {
+    return cartsWithMembers.map((cart) => {
       if (formattedCartItems[cart.id] === undefined) return {...cart, items: []};
 
       return {...cart, items: formattedCartItems[cart.id]}

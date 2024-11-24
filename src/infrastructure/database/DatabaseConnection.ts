@@ -16,7 +16,7 @@ export const AppDataSource = new DataSource({
   database: 'family-cart',
   entities: [UserSchema, CartSchema, RoleAssignmentSchema, CartItemSchema],
   logging: false,
-  synchronize: false,
+  synchronize: true,
 });
 
 export const connectDatabase = async () => {

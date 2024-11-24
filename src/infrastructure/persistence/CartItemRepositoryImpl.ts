@@ -1,5 +1,5 @@
 import {ICartItemRepository} from '../../domain/repositories/ICartItemRepository';
-import {CartItem} from '../../domain/entities/index';
+import {Cart, CartItem, User} from '../../domain/entities/index';
 import {AppDataSource} from '../database/DatabaseConnection';
 import {Repository} from 'typeorm';
 import {CartItemSchema} from './models/CartItemSchema';
@@ -17,16 +17,28 @@ export class CartItemRepositoryImpl implements ICartItemRepository {
     return new CartItem(savedEntity.id, savedEntity.cart, savedEntity.name, savedEntity.isDone);
   }
 
-  delete(id: number): Promise<CartItem> {
-    return Promise.resolve(undefined);
+  async delete(id: number): Promise<CartItem> {
+    const item = await this.ormRepository.findOne({where: {id: id}});
+
+    if (item) {
+      await this.ormRepository.remove(item);
+    }
+
+    return new CartItem(item.id, item.cart, item.name, item.isDone);
   }
 
   getAll(): Promise<CartItem[]> {
     return Promise.resolve([]);
   }
 
-  getById(id: number): Promise<CartItem> {
-    return this.ormRepository.findOneBy({id});
+  async getById(id: number): Promise<CartItem> {
+    const itemEntity = await this.ormRepository.findOneBy({ id });
+
+    if (!itemEntity) {
+      return null;
+    }
+
+    return new CartItem(itemEntity.id, itemEntity.cart, itemEntity.name, itemEntity.isDone);
   }
 
   getByName(name: string): Promise<CartItem> {
@@ -37,5 +49,15 @@ export class CartItemRepositoryImpl implements ICartItemRepository {
     await this.ormRepository.update(cartItem.id, {isDone: cartItem.isDone});
     const updatedCartItem = await this.ormRepository.findOne({ where: {id: cartItem.id}, relations: ['cart'] } );
     return new CartItem(updatedCartItem.id, updatedCartItem.cart, updatedCartItem.name, updatedCartItem.isDone);
+  }
+
+  async getByCartId(id: number): Promise<CartItem[]> {
+    const cartItems = await this.ormRepository.find({where: {
+        cart: {
+          id: id,
+        },
+      }, relations: ['cart']});
+
+    return cartItems.map(item => new CartItem(item.id, item.cart, item.name, item.isDone));
   }
 }

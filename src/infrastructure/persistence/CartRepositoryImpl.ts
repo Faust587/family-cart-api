@@ -44,8 +44,9 @@ export class CartRepositoryImpl implements ICartRepository {
     return this.ormRepository.findOneBy({name})
   }
 
-  update(cart: Cart): Promise<Cart> {
-    return Promise.resolve(undefined);
+  async update(cart: Cart): Promise<Cart> {
+    const updatedEntity = await this.ormRepository.save(cart);
+    return new Cart(updatedEntity.id, updatedEntity.name);
   }
 
   getByUserId(userId: number): Promise<Cart[]> {
