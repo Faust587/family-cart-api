@@ -86,6 +86,7 @@ export class CartController {
         const createdResult = await this.addItemToCartUseCase.execute(name, cartId);
         return res.status(201).json(createdResult);
       } catch (error) {
+        console.log('error', error)
         res.status(500).json({message: `An error occurred while creating cart item`});
       }
     }

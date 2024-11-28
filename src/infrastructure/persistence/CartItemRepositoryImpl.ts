@@ -32,7 +32,10 @@ export class CartItemRepositoryImpl implements ICartItemRepository {
   }
 
   async getById(id: number): Promise<CartItem> {
-    const itemEntity = await this.ormRepository.findOneBy({ id });
+    const itemEntity = await this.ormRepository.findOne({
+      where: { id },
+      relations: ['cart'],
+    });
 
     if (!itemEntity) {
       return null;

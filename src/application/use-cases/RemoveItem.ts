@@ -17,6 +17,8 @@ export class RemoveItem implements IRemoveItem {
       throw new Error(`Cart item not found`);
     }
 
+    console.log('item', item)
+
     const assignments = await this.roleAssignmentRepository.getByCartId(item.cart.id);
     const userAssignments = assignments.find(assignmentItem => assignmentItem.user.id === userId);
 
