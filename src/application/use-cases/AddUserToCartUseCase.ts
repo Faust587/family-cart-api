@@ -13,6 +13,8 @@ export class AddUserToCartUseCase implements IAddUserToCartUseCase {
     const cart = await this.cartRepository.getById(cartId);
     const user = await this.userRepository.getByEmail(email);
 
+    if (!user) throw new Error("User not found");
+
     const isAssignmentExists = await this.roleAssignmentRepository.getByUserAndCartId(user.id , cartId);
     if (!!isAssignmentExists) {
       return isAssignmentExists;

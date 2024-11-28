@@ -14,7 +14,6 @@ import {IAddUserToCartUseCase} from '../../application/interfaces/IAddUserToCart
 import {IRemoveUserFromCart} from '../../application/interfaces/IRemoveUserFromCart';
 import {IRenameCartUseCase} from '../../application/interfaces/IRenameCartUseCase';
 import {RenameCartDTO} from '../../application/dtos/RenameCartDTO';
-import {RemoveItem} from '../../application/use-cases/RemoveItem';
 import {IRemoveItem} from '../../application/interfaces/IRemoveItem';
 import {RemoveUserFromCartDTO} from '../../application/dtos/RemoveUserFromCartDTO';
 
@@ -117,7 +116,7 @@ export class CartController {
         const updatedResult = await this.addUserToCartUseCase.execute(email, cartId);
         return res.status(200).json(updatedResult);
       } catch (error) {
-        res.status(500).json({message: `An error occurred while adding user to the cart`});
+        res.status(500).json({message: error.message ?? `An error occurred while adding user to the cart`});
       }
     }
   ]
